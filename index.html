@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EnergyPath</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4a7c59">
+
+  <!-- Optional for iOS -->
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f8f5;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 420px;
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1, h2, h3 {
+      color: #4a7c59;
+    }
+
+    button {
+      background: #a2d5c6;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      margin: 10px 0;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #76bfa4;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .card {
+      background: #d9f0ea;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 15px;
+      text-align: left;
+    }
+
+    a {
+      color: #4a7c59;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .details {
+      margin-top: 10px;
+      padding-left: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Home Page -->
+<div class="container" id="home">
+  <h1>EnergyPath</h1>
+  <h2>Restore your energy. Reconnect with your life.</h2>
+  <button onclick="startQuiz()">Get Started</button>
+  <button onclick="showSummary()">Learn About Doshas</button>
+</div>
+
+<!-- Quiz Page -->
+<div class="container hidden" id="quiz">
+  <h2 id="questionText"></h2>
+  <div id="answers"></div>
+</div>
+
+<!-- Result Page -->
+<div class="container hidden" id="result">
+  <h2>Your Dosha Profile</h2>
+  <div id="doshaResult"></div>
+  <button onclick="restart()">Take Quiz Again</button>
+</div>
+
+<!-- Summary Page -->
+<div class="container hidden" id="summary">
+  <h2>About the Doshas</h2>
+  <div class="card details">
+    <p>Ayurveda is an ancient system of health from India that looks at the whole person – body, mind, and spirit. Unlike Western medicine, which is very effective but often focuses on individual symptoms, Ayurveda takes a holistic approach.</p>
+  </div>
+  <div class="card details">
+    <p>Everyone has a combination of three doshas: <strong>Vata</strong>, <strong>Pitta</strong>, and <strong>Kapha</strong>. Each represents different qualities in the body and mind. Most people have one dominant dosha, though all three are present.</p>
+  </div>
+  <div class="card details">
+    <p>When your doshas are balanced, you feel energetic, focused, and healthy. When out of balance, certain patterns may appear:</p>
+    <ul>
+      <li><strong>Kapha 🌿:</strong> May feel sluggish, prone to chest congestion or infections</li>
+      <li><strong>Pitta 🔥:</strong> May overheat, prone to reflux, inflammation, or skin irritations</li>
+      <li><strong>Vata 🌬️:</strong> May feel dry, anxious, or have digestive/joint discomfort</li>
+    </ul>
+  </div>
+  <div class="card details">
+    <p>For example, as a Kapha-dominant person, I found my energy improved when I practiced <strong>Kundalini yoga</strong> and followed Ayurvedic routines. Each dosha benefits from specific routines, breathwork, and movement practices to stay balanced.</p>
+  </div>
+  <div class="card details">
+    <p>This app helps you discover your dominant and secondary doshas and provides strategies – yoga, breathwork, and food guidance – to support your energy and wellbeing.</p>
+  </div>
+  <button onclick="showHomeFromSummary()">Back to Home</button>
+</div>
+
+<!-- Quiz JS -->
+<script>
+/* ---------- QUIZ DATA ---------- */
+const questions = [
+  { text: "How is your energy most days?", options: [
+      { text: "Changeable, light", dosha: "Vata" },
+      { text: "Strong, intense", dosha: "Pitta" },
+      { text: "Steady, slow", dosha: "Kapha" }
+    ]
+  },
+  { text: "How is your sleep?", options: [
+      { text: "Light or disturbed", dosha: "Vata" },
+      { text: "Moderate, sometimes restless", dosha: "Pitta" },
+      { text: "Deep and long", dosha: "Kapha" }
+    ]
+  },
+  { text: "How do you react to stress?", options: [
+      { text: "Anxious or scattered", dosha: "Vata" },
+      { text: "Frustrated or intense", dosha: "Pitta" },
+      { text: "Withdrawn or heavy", dosha: "Kapha" }
+    ]
+  },
+  { text: "How is your appetite?", options: [
+      { text: "Irregular, sometimes skipped meals", dosha: "Vata" },
+      { text: "Strong, sometimes fiery", dosha: "Pitta" },
+      { text: "Slow, sometimes low", dosha: "Kapha" }
+    ]
+  },
+  { text: "How do you feel about daily activity?", options: [
+      { text: "Restless, need constant movement", dosha: "Vata" },
+      { text: "Competitive, driven", dosha: "Pitta" },
+      { text: "Slow, prefer comfort", dosha: "Kapha" }
+    ]
+  },
+  { text: "How is your digestion?", options: [
+      { text: "Variable, bloating, or gas", dosha: "Vata" },
+      { text: "Strong, sometimes heartburn", dosha: "Pitta" },
+      { text: "Slow, heavy, sluggish", dosha: "Kapha" }
+    ]
+  },
+  { text: "How is your mental focus?", options: [
+      { text: "Easily distracted, creative", dosha: "Vata" },
+      { text: "Sharp, goal-oriented", dosha: "Pitta" },
+      { text: "Calm, methodical", dosha: "Kapha" }
+    ]
+  }
+];
+
+let scores = { Vata: 0, Pitta: 0, Kapha: 0 };
+let currentQuestion = 0;
+
+/* ---------- DOSHA TEXT ---------- */
+const doshaText = {
+  Vata: "Vata represents movement, creativity, and flexibility.",
+  Pitta: "Pitta represents focus, metabolism, and drive.",
+  Kapha: "Kapha represents steadiness, strength, and calm."
+};
+
+/* ---------- DOSHA PLANS ---------- */
+const doshaPlans = {
+  Vata: `
+    <h3>Vata 🌬️ Balancing</h3>
+    <ul>
+      <li><strong>Yoga:</strong> Yin or Restorative, gentle Hatha flow to ground your energy</li>
+      <li><strong>Calming breath:</strong> Slow nasal breathing with longer exhales, 5 min</li>
+      <li><strong>Breakfast ideas:</strong> Warm oats, stewed fruit, cinnamon, nut butter</li>
+      <li>Avoid overstimulation and skipped meals</li>
+    </ul>
+    <button onclick="copyPlan('Vata')">Copy Plan</button>
+  `,
+  Pitta: `
+    <h3>Pitta 🔥 Balancing</h3>
+    <ul>
+      <li><strong>Yoga:</strong> Hatha, Yin, Restorative – cooling, calming, and grounding</li>
+      <li><strong>Cooling breath:</strong> Soft nasal breathing at a relaxed pace</li>
+      <li><strong>Breakfast ideas:</strong> Berries, coconut, oats, smoothies</li>
+      <li>Avoid excessive heat, spicy foods, and overwork</li>
+    </ul>
+    <button onclick="copyPlan('Pitta')">Copy Plan</button>
+  `,
+  Kapha: `
+    <h3>Kapha 🌿 Balancing</h3>
+    <ul>
+      <li><strong>Yoga:</strong> Kundalini, Vinyasa, Power Yoga – energizing and stimulating</li>
+      <li><strong>Invigorating breath:</strong> Firm nasal exhales, 10 rounds, stop if dizzy</li>
+      <li><strong>Breakfast ideas:</strong> Warm oats, blueberries, lemon & ginger tea. Avoid dairy and oily foods</li>
+      <li>Rise early and keep mornings active</li>
+    </ul>
+    <button onclick="copyPlan('Kapha')">Copy Plan</button>
+  `
+};
+
+/* ---------- QUIZ FUNCTIONS ---------- */
+function startQuiz() {
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = questions[currentQuestion];
+  document.getElementById("questionText").textContent = q.text;
+  const answers = document.getElementById("answers");
+  answers.innerHTML = "";
+
+  q.options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.textContent = opt.text;
+    btn.onclick = () => selectAnswer(opt.dosha);
+    answers.appendChild(btn);
+  });
+}
+
+function selectAnswer(dosha) {
+  scores[dosha]++;
+  currentQuestion++;
+  if (currentQuestion < questions.length) {
+    showQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+
+  const sorted = Object.keys(scores).sort((a,b) => scores[b] - scores[a]);
+  const dominant = sorted[0];
+  const secondary = sorted[1];
+
+  document.getElementById("doshaResult").innerHTML = `
+    <div class="card">
+      <p><strong>Dominant Dosha: ${dominant}</strong></p>
+      <p>${doshaText[dominant]}</p>
+    </div>
+    <button onclick="showPlan('${dominant}', this)">View ${dominant} balancing plan</button>
+    <button onclick="showSecondary('${secondary}', this)">Learn about your secondary dosha: ${secondary}</button>
+  `;
+}
+
+function showPlan(dosha, btn) {
+  const div = document.createElement("div");
+  div.className = "card details";
+  div.innerHTML = doshaPlans[dosha];
+  document.getElementById("doshaResult").appendChild(div);
+  btn.disabled = true;
+}
+
+function showSecondary(dosha, btn) {
+  const div = document.createElement("div");
+  div.className = "card details";
+  div.innerHTML = doshaPlans[dosha]; // Show full plan for secondary dosha
+  document.getElementById("doshaResult").appendChild(div);
+  btn.disabled = true;
+}
+
+function copyPlan(dosha) {
+  navigator.clipboard.writeText(doshaPlans[dosha].replace(/<[^>]*>/g, ''));
+  alert("Plan copied to clipboard!");
+}
+
+function restart() {
+  scores = { Vata: 0, Pitta: 0, Kapha: 0 };
+  currentQuestion = 0;
+  document.getElementById("result").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+}
+
+function showSummary() {
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("summary").classList.remove("hidden");
+}
+
+function showHomeFromSummary() {
+  document.getElementById("summary").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+}
+</script>
+
+<!-- Disclaimer -->
+<p style="font-size:12px; color:#555; margin-top:20px; text-align:center;">
+  Disclaimer: This app is intended for educational purposes only and provides guidance on complementary practices. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult your healthcare provider regarding any health concerns.
+</p>
+
+<!-- Service Worker Registration -->
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js')
+    .then(() => console.log('Service Worker registered'))
+    .catch(err => console.error('Service Worker registration failed:', err));
+}
+</script>
+
+</body>
+</html>
