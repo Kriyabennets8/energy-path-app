@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EnergyPath</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4a7c59">
+
+  <!-- Optional for iOS -->
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f8f5;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      max-width: 420px;
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h1, h2, h3 {
+      color: #4a7c59;
+    }
+
+    button {
+      background: #a2d5c6;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      margin: 10px 0;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #76bfa4;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .card {
+      background: #d9f0ea;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 15px;
+      text-align: left;
+    }
+
+    a {
+      color: #4a7c59;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .details {
+      margin-top: 10px;
+      padding-left: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Your existing HTML content remains unchanged -->
+<div class="container" id="home">
+  <h1>EnergyPath</h1>
+  <h2>Restore your energy. Reconnect with your life.</h2>
+  <button onclick="startQuiz()">Get Started</button>
+  <button onclick="showSummary()">Learn About Doshas</button>
+</div>
+
+<div class="container hidden" id="quiz">
+  <h2 id="questionText"></h2>
+  <div id="answers"></div>
+</div>
+
+<div class="container hidden" id="result">
+  <h2>Your Dosha Profile</h2>
+  <div id="doshaResult"></div>
+  <button onclick="restart()">Take Quiz Again</button>
+</div>
+
+<div class="container hidden" id="summary">
+  <h2>About the Doshas</h2>
+  <div class="card details">
+    <p>Ayurveda is an ancient system of health from India that looks at the whole person – body, mind, and spirit. Unlike Western medicine, which is very effective but often focuses on individual symptoms, Ayurveda takes a holistic approach.</p>
+  </div>
+  <!-- Remaining summary content unchanged -->
+  <button onclick="showHomeFromSummary()">Back to Home</button>
+</div>
+
+<!-- Your quiz JS remains unchanged -->
+<script>
+/* ---------- QUIZ DATA AND FUNCTIONS ---------- */
+const questions = [ /* your existing questions */ ];
+let scores = { Vata: 0, Pitta: 0, Kapha: 0 };
+let currentQuestion = 0;
+
+/* DOSHA TEXT AND PLANS */
+const doshaText = { /* your existing text */ };
+const doshaPlans = { /* your existing plans */ };
+
+/* QUIZ FUNCTIONS */
+function startQuiz() { /* unchanged */ }
+function showQuestion() { /* unchanged */ }
+function selectAnswer(dosha) { /* unchanged */ }
+function showResult() { /* unchanged */ }
+function showPlan(dosha, btn) { /* unchanged */ }
+function showSecondary(dosha, btn) { /* unchanged */ }
+function copyPlan(dosha) { /* unchanged */ }
+function restart() { /* unchanged */ }
+function showSummary() { /* unchanged */ }
+function showHomeFromSummary() { /* unchanged */ }
+</script>
+
+<!-- Disclaimer -->
+<p style="font-size:12px; color:#555; margin-top:20px; text-align:center;">
+  Disclaimer: This app is intended for educational purposes only and provides guidance on complementary practices. It is not a substitute for professional medical advice, diagnosis, or treatment. Always consult your healthcare provider regarding any health concerns.
+</p>
+
+<!-- Service Worker Registration -->
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(() => console.log('Service Worker registered'))
+      .catch((err) => console.error('Service Worker registration failed:', err));
+  }
+</script>
+
+</body>
+</html>
