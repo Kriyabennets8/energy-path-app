@@ -1,42 +1,407 @@
-{
-  "name": "EnergyPath",
-  "short_name": "EnergyPath",
-  "description": "Restore your energy and reconnect with your life using Ayurvedic guidance.",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#f0f8f5",
-  "theme_color": "#4a7c59",
-  "orientation": "portrait",
-  "scope": "./",
-  "categories": ["health", "education", "lifestyle"],
-  "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>EnergyPath</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4a7c59">
+
+  <!-- Optional for iOS -->
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+  <style>
+    html,
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f8f5;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      min-width: 320px;
+      flex-direction: column;
+      align-items: center;
     }
-  ],
-  "shortcuts": [
-    {
-      "name": "Take Dosha Quiz",
-      "short_name": "Quiz",
-      "description": "Start the Ayurvedic dosha quiz",
-      "url": "./index.html#quiz",
-      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Learn About Doshas",
-      "short_name": "Doshas",
-      "description": "View Ayurvedic dosha information",
-      "url": "./index.html#summary",
-      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+
+    .container {
+      max-width: 420px;
+      width: 100%;
+      padding: 20px;
+      text-align: center;
+      box-sizing: border-box;
     }
-  ]
-}
+
+    h1,
+    h2,
+    h3,
+    p,
+    li,
+    button,
+    a {
+      font-size: 16px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      color: #4a7c59;
+    }
+
+    button {
+      background: #a2d5c6;
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      margin: 10px 0;
+      width: 100%;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #76bfa4;
+    }
+
+    /* --- Per-screen button colors --- */
+    /* Home: default green (#a2d5c6) */
+
+    /* Summary (About Doshas): soft teal */
+    #summary button {
+      background: #7ec8c8;
+    }
+
+    #summary button:hover {
+      background: #5fb3b3;
+    }
+
+    /* Energy Centres: chakra buttons keep their inline colors, Back button gets warm tone */
+    #chakras>button:last-child {
+      background: #e0a88e;
+    }
+
+    #chakras>button:last-child:hover {
+      background: #d0907a;
+    }
+
+    /* Balancing Chakras: soft lavender/purple */
+    #balancing button {
+      background: #b39ddb;
+    }
+
+    #balancing button:hover {
+      background: #9575cd;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .card {
+      background: #d9f0ea;
+      padding: 15px;
+      border-radius: 12px;
+      margin-top: 15px;
+      text-align: left;
+    }
+
+    a {
+      color: #4a7c59;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .details {
+      margin-top: 10px;
+      padding-left: 10px;
+    }
+
+    /* Meditation section styling */
+    .meditation-section {
+      background: #e8f5e9;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .meditation-section h3 {
+      margin-top: 0;
+    }
+
+    .meditation-link {
+      display: inline-block;
+      background: #7fc8a9;
+      color: #fff;
+      padding: 14px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .meditation-link:hover {
+      background: #66b092;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    /* Disclaimer modal */
+    #disclaimerModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+    }
+
+    #disclaimerContent {
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 90%;
+      text-align: center;
+    }
+
+    #disclaimerContent p {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 400px) {
+      .container {
+        padding: 10px;
+      }
+
+      button {
+        font-size: 16px;
+        padding: 12px;
+      }
+
+      #disclaimerContent p {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Home Page -->
+  <div class="container" id="home">
+    <h1>EnergyPath</h1>
+    <h2>Restore your energy. Reconnect with your life.</h2>
+    <button id="btnSummary">Learn About Doshas</button>
+    <!-- Quiz buttons loaded automatically from quizzes/config.js -->
+    <div id="quizButtons"></div>
+    <script src="quizzes/config.js"></script>
+    <script>
+      (function () {
+        var container = document.getElementById("quizButtons");
+        quizConfig.forEach(function (quiz) {
+          var btn = document.createElement("button");
+          btn.textContent = quiz.name;
+          btn.onclick = function () {
+            window.location.href = "quizzes/" + quiz.file;
+          };
+          container.appendChild(btn);
+        });
+      })();
+    </script>
+    <button id="btnChakras">Energy Centres</button>
+    <button id="btnBalancing">Balancing Chakras</button>
+  </div>
+
+  <!-- Summary Page (Dosha Info) -->
+  <div class="container hidden" id="summary">
+    <h2>About the Doshas</h2>
+    <div class="card details">
+      <p>Ayurveda is an ancient system of health from India that looks at the whole person – body, mind, and spirit.
+        Unlike Western medicine, which is very effective but often focuses on individual symptoms, Ayurveda takes a
+        holistic approach.</p>
+    </div>
+    <div class="card details">
+      <p>Everyone has a combination of three doshas: <strong>Vata</strong>, <strong>Pitta</strong>, and
+        <strong>Kapha</strong>. Each represents different qualities in the body and mind. Most people have one dominant
+        dosha, though all three are present.
+      </p>
+    </div>
+    <div class="card details">
+      <p>When your doshas are balanced, you feel energetic, focused, and healthy. When out of balance, certain patterns
+        may appear:</p>
+      <ul>
+        <li><strong>Kapha 🌿:</strong> May feel sluggish, prone to chest congestion or infections</li>
+        <li><strong>Pitta 🔥:</strong> May overheat, prone to reflux, inflammation, or skin irritations</li>
+        <li><strong>Vata 🌬️:</strong> May feel dry, anxious, or have digestive/joint discomfort</li>
+      </ul>
+    </div>
+    <div class="card details">
+      <p>As a Kapha-dominant person, energy can improve with <strong>Kundalini yoga</strong>. Pitta benefits from
+        <strong>Yin or Restorative yoga</strong> to cool and calm energy. Each dosha benefits from specific routines,
+        breathwork, and movement practices to stay balanced.
+      </p>
+    </div>
+    <div class="card details">
+      <p>This app helps you discover your dominant and secondary doshas and provides strategies – yoga, breathwork, and
+        food guidance – to support your energy and wellbeing.</p>
+    </div>
+    <button onclick="showHomeFromSection('summary')">Back to Home</button>
+  </div>
+
+  <!-- Chakra Info Section -->
+  <div class="container hidden" id="chakras">
+    <h2>Energy Centres (Chakras)</h2>
+    <div class="card details">
+      <p>Energy centres in our body known as chakras are associated with different feelings and themes. Any strong
+        emotions that we do not feel and integrate can stay stuck in our body (samskaras) and create a block in certain
+        energy centres depending on the theme. Luckily, the universe is always bringing us mirrors of similar, often
+        milder forms of what we did not feel and integrate, so we must feel and integrate in order to unblock the
+        chakra. Because some chakras are very blocked, energy flow up the chakras to the heart chakra can be inhibited.
+        Everyone in this life wants to evolve, and that's why it is important to slow down and integrate lessons.</p>
+    </div>
+
+    <button style="background:lightcoral;" onclick="toggleChakraDetail(this,'Root')">Root Chakra</button>
+    <button style="background:lightsalmon;" onclick="toggleChakraDetail(this,'Sacral')">Sacral Chakra</button>
+    <button style="background:lightyellow;color:#333;" onclick="toggleChakraDetail(this,'Solar')">Solar Plexus</button>
+    <button style="background:lightgreen;" onclick="toggleChakraDetail(this,'Heart')">Heart Chakra</button>
+    <button style="background:lightblue;" onclick="toggleChakraDetail(this,'Throat')">Throat Chakra</button>
+    <button style="background:mediumpurple;" onclick="toggleChakraDetail(this,'ThirdEye')">Third Eye</button>
+    <button style="background:plum;" onclick="toggleChakraDetail(this,'Crown')">Crown Chakra</button>
+
+    <button onclick="showHomeFromSection('chakras')">Back to Home</button>
+  </div>
+
+  <!-- Balancing Chakras Section -->
+  <div class="container hidden" id="balancing">
+    <h2>Balancing Your Chakras</h2>
+
+    <div class="card details">
+      <p>Although energy travels from the root chakra to the crown, many people have blockages in between, known as
+        <strong>samskaras</strong> — blocked feelings, beliefs, and traumas.
+      </p>
+      <p>The path to integration starts with the <strong>heart centre</strong>. Opening the heart chakra brings
+        self-compassion and self-love. Whatever we are experiencing internally starts to be mirrored externally too. The
+        work of opening the heart chakra cannot be underestimated.</p>
+    </div>
+
+    <div class="card details">
+      <h3 style="color:lightgreen;">To Start:</h3>
+      <p><strong>Practice Bhakti yoga / Kirtan meditation</strong> — via online videos or your nearest studio. Focus on
+        giving and receiving a feeling of love to a god of your choice while singing.</p>
+      <p><em>Practice regularly, at least 3 times a week to start.</em></p>
+    </div>
+
+    <div class="card details">
+      <p><strong>Listen to the meditation below</strong> daily or 3 times a week to start.</p>
+    </div>
+
+    <!-- Meditation Section -->
+    <div class="meditation-section">
+      <h3>Heart Chakra Meditation</h3>
+      <audio id="meditationAudio" controls style="width:100%; margin-top:10px;">
+        <source src="Heart.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+      <p style="font-size:13px; color:#666; margin-top:12px;">Use headphones for the best experience.</p>
+    </div>
+
+    <div class="card details">
+      <p>This path can be followed for <strong>2 – 4 weeks intentionally</strong> or longer for real change. Regular
+        practice softens and opens the heart, creating a foundation for the beginning of our spiritual journey inwards
+        in order to integrate stuck samskaras and carry out our soul's purpose.</p>
+    </div>
+
+    <button onclick="showHomeFromSection('balancing')">Back to Home</button>
+  </div>
+
+  <!-- Disclaimer Modal -->
+  <div id="disclaimerModal">
+    <div id="disclaimerContent">
+      <p>This app is intended for educational purposes only and provides guidance on complementary practices. It is not
+        a substitute for professional medical advice, diagnosis, or treatment. Always consult your healthcare provider
+        regarding any health concerns.</p>
+      <button onclick="acceptDisclaimer()">Agree</button>
+    </div>
+  </div>
+
+  <script>
+    /* ---------- HOME BUTTON NAVIGATION ---------- */
+    document.getElementById("btnSummary").onclick = function () { showSection("summary"); };
+    document.getElementById("btnChakras").onclick = function () { showSection("chakras"); };
+    document.getElementById("btnBalancing").onclick = function () { showSection("balancing"); };
+
+    /* ---------- SECTION SHOW/HIDE ---------- */
+    function showSection(sectionId) {
+      document.getElementById("home").classList.add("hidden");
+      document.getElementById(sectionId).classList.remove("hidden");
+    }
+
+    function showHomeFromSection(sectionId) {
+      /* Stop meditation audio if leaving the balancing page */
+      var audio = document.getElementById("meditationAudio");
+      if (audio && !audio.paused) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+      document.getElementById(sectionId).classList.add("hidden");
+      document.getElementById("home").classList.remove("hidden");
+    }
+
+    /* ---------- CHAKRA INFO DETAILS ---------- */
+    const chakraDetails = {
+      Root: { color: 'lightcoral', text: 'Root Chakra – Safety, fear, security. Feeling safe in current environments.' },
+      Sacral: { color: 'lightsalmon', text: 'Sacral Chakra – Relationships, creativity, pleasure. Do we feel safe to give and receive?' },
+      Solar: { color: 'lightyellow', text: 'Solar Plexus – Confidence, drive, self-worth. Feeling empowered to build the life you want.' },
+      Heart: { color: 'lightgreen', text: 'Heart Chakra – Compassion, gentleness, love and openness, including self-love.' },
+      Throat: { color: 'lightblue', text: 'Throat Chakra – Clarity of speech and self-expression. Feeling in harmony with surroundings.' },
+      ThirdEye: { color: 'mediumpurple', text: 'Third Eye – Intuition, inner wisdom, clarity. Sudden insights and knowing without over-analysis.' },
+      Crown: { color: 'plum', text: 'Crown – Universal consciousness and enlightenment. Feeling at one with everything and divine expression.' }
+    };
+
+    function toggleChakraDetail(btn, chakra) {
+      const parent = btn.parentNode;
+      let existing = parent.querySelector(".chakra-card[data-chakra='" + chakra + "']");
+      if (existing) {
+        existing.scrollIntoView({ behavior: "smooth" });
+        return;
+      }
+      const div = document.createElement("div");
+      div.className = "card details chakra-card";
+      div.setAttribute("data-chakra", chakra);
+      div.style.background = chakraDetails[chakra].color;
+      div.textContent = chakraDetails[chakra].text;
+      parent.insertBefore(div, btn.nextSibling);
+      div.scrollIntoView({ behavior: "smooth" });
+    }
+
+    /* ---------- DISCLAIMER (once per session) ---------- */
+    if (sessionStorage.getItem("disclaimerAccepted")) {
+      document.getElementById("disclaimerModal").style.display = "none";
+    } else {
+      document.body.style.pointerEvents = "none";
+      document.getElementById("disclaimerContent").style.pointerEvents = "auto";
+    }
+
+    function acceptDisclaimer() {
+      sessionStorage.setItem("disclaimerAccepted", "true");
+      document.getElementById("disclaimerModal").style.display = "none";
+      document.body.style.pointerEvents = "auto";
+    }
+  </script>
+
+</body>
+
+</html>
